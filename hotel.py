@@ -78,16 +78,25 @@ class Hotel:
         return True
 
     def move_in(self, floor_number, room, guest):
-        rooms_on_floor = self.building[floor_number].rooms
-        for r in rooms_on_floor:
-            if r.room_number == room:
-                r.guest = guest
-        print(f'Guest {guest} is moved in to room number {room}, on floor number {floor_number}')
+        try:
+            if floor_number == self.building[floor_number].floor:
+                rooms_on_floor = self.building[floor_number].rooms
+                for r in rooms_on_floor:
+                    if r.room_number == room:
+                        r.guest = guest
+                        print(f'Guest {guest} is moved in to room number {room}, on floor number {floor_number}')
+                        return True
+                print("Incorrect room number!")
+                return False
+
+        except IndexError:
+            print('Incorrect floor number!')
+            return False
 
 if __name__ == '__main__':
     g = Person('Kamil', 'Cieszkowski')
     h = Hotel(5, 17)
     h.create_floors()
     h.create_hotel()
-    h.move_in(2, 9, g)
-    print(h.building[2].rooms[0].guest)
+    h.move_in(2, 11, g)
+    print(h.building[2].rooms[2].guest)
