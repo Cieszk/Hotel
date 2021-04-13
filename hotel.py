@@ -43,6 +43,8 @@ class Hotel:
         self.rooms_number = rooms_number
         self.building = []
         self.placeholder_counter = 0
+        self.room_dict = {}
+        self.number_of_free_rooms = 0
 
     def change_placeholder(self, building_list, rooms_list):
         for index, item in enumerate(building_list):
@@ -93,10 +95,40 @@ class Hotel:
             print('Incorrect floor number!')
             return False
 
+    def generate_map_of_free_rooms(self, building_list):
+        for index, item in enumerate(building_list):
+            if isinstance(item, Floor):
+                self.generate_map_of_free_rooms(item)
+            elif item.guest is None:
+                self.room_dict[f'Room number {item.room_number}'] = 'Free'
+            elif isinstance(item.guest, Person):
+                self.room_dict[f'Room number {item.room_number}'] = 'Taken'
+        return True
+
+    def show_free_rooms(self):
+        self.generate_map_of_free_rooms(self.building)
+        for v in self.room_dict.values():
+            if v == 'Free':
+                self.number_of_free_rooms += 1
+        print(f'There is {self.number_of_free_rooms} free rooms, here is plan o free rooms:\n{self.room_dict}')
+        return True
+
+
 if __name__ == '__main__':
+    # Tworzenie gościa
     g = Person('Kamil', 'Cieszkowski')
+
+    # Generowanie Hotelu
     h = Hotel(5, 17)
     h.create_floors()
     h.create_hotel()
+
+    # Generowanie hotelu z wywołaniem błędu
+    # h = Hotel(10,2)
+
+    # Zameldowanie Gościa na piętro 2 do pokoju 11
     h.move_in(2, 11, g)
-    print(h.building[2].rooms[2].guest)
+
+    # Pokazanie wolnych pokoi
+    h.show_free_rooms()
+
