@@ -80,14 +80,14 @@ class Hotel:
         print(f'Hotel created, here is plan of the building:\n{self.building}')
         return True
 
-    def move_in(self, guest, floor_number, *rooms):
+    def move_in(self, guest, floor_number, room):
         try:
             if floor_number == self.building[floor_number].floor:
                 rooms_on_floor = self.building[floor_number].rooms
                 for r in rooms_on_floor:
-                    if r.room_number == rooms:
+                    if r.room_number == room:
                         r.guest = guest
-                        print(f'Guest {guest} is moved in to room number {rooms}, on floor number {floor_number}')
+                        print(f'Guest {guest} is moved in to room number {room}, on floor number {floor_number}')
                         return True
                 print("Incorrect room number!")
                 return False
@@ -133,10 +133,21 @@ class Hotel:
         print("There is no guest booked in our hotel with that name.")
         return None
 
-    # def check_if_guest_can_book_adjoining_rooms(self, room_number):
-    #     self.__generate_map_of_free_rooms(self.building)
-    #     for k, v in self.room_dict.items():
-    #         if k.room_number == room_number:
+    def sing_out_guest(self, guest, flag='All rooms'):
+        if flag == "All rooms":
+            for floor in self.building:
+                for room in floor:
+                    if room.guest == guest:
+                        room.guest = None
+            print(f"Guest {guest} is sing out of all of his booked rooms.")
+        elif isinstance(flag, int) and flag <= self.rooms_number:
+            for floor in self.building:
+                for room in floor:
+                    if flag == room.room_number and room.guest == guest:
+                        room.guest = None
+        else:
+            print("There is no such room or guest in our hotel.")
+
 
 
 
@@ -155,9 +166,18 @@ if __name__ == '__main__':
 
     # Zameldowanie Gościa na piętro 2 do pokoju 11
     h.move_in(g, 2, 11)
+    h.move_in(g, 3, 18)
 
     # Pokazanie wolnych pokoi
     # h.show_free_rooms()
 
     # Sprawdzenie czy gość znajduje się w hotelu
     h.check_if_guest_is_in_hotel(g)
+
+    # Wymelodwanie gościa z wszystkich pokoi które zajmuje
+    # h.sing_out_guest(g)
+
+    # Wymeldowanie gościa z jednego podanego pokoju
+    h.sing_out_guest(g, 42)
+
+
