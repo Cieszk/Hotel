@@ -45,6 +45,7 @@ class Hotel:
         self.placeholder_counter = 0
         self.room_dict = {}
         self.number_of_free_rooms = 0
+        self.guest_dict = {}
 
     def change_placeholder(self, building_list, rooms_list):
         for index, item in enumerate(building_list):
@@ -79,14 +80,14 @@ class Hotel:
         print(f'Hotel created, here is plan of the building:\n{self.building}')
         return True
 
-    def move_in(self, floor_number, room, guest):
+    def move_in(self, guest, floor_number, *rooms):
         try:
             if floor_number == self.building[floor_number].floor:
                 rooms_on_floor = self.building[floor_number].rooms
                 for r in rooms_on_floor:
-                    if r.room_number == room:
+                    if r.room_number == rooms:
                         r.guest = guest
-                        print(f'Guest {guest} is moved in to room number {room}, on floor number {floor_number}')
+                        print(f'Guest {guest} is moved in to room number {rooms}, on floor number {floor_number}')
                         return True
                 print("Incorrect room number!")
                 return False
@@ -95,10 +96,10 @@ class Hotel:
             print('Incorrect floor number!')
             return False
 
-    def generate_map_of_free_rooms(self, building_list):
+    def __generate_map_of_free_rooms(self, building_list):
         for index, item in enumerate(building_list):
             if isinstance(item, Floor):
-                self.generate_map_of_free_rooms(item)
+                self.__generate_map_of_free_rooms(item)
             elif item.guest is None:
                 self.room_dict[f'Room number {item.room_number}'] = 'Free'
             elif isinstance(item.guest, Person):
@@ -106,12 +107,38 @@ class Hotel:
         return True
 
     def show_free_rooms(self):
-        self.generate_map_of_free_rooms(self.building)
+        self.__generate_map_of_free_rooms(self.building)
         for v in self.room_dict.values():
             if v == 'Free':
                 self.number_of_free_rooms += 1
         print(f'There is {self.number_of_free_rooms} free rooms, here is plan o free rooms:\n{self.room_dict}')
         return True
+
+    def __generate_map_of_booked_guests(self, building_list):
+        for index, item in enumerate(building_list):
+            if isinstance(item, Floor):
+                self.__generate_map_of_booked_guests(item)
+            elif item.guest is None:
+                self.guest_dict[f'Room number {item.room_number}'] = None
+            elif isinstance(item.guest, Person):
+                self.guest_dict[f'Room number {item.room_number}'] = item.guest
+        return True
+
+    def check_if_guest_is_in_hotel(self, guest):
+        self.__generate_map_of_booked_guests(self.building)
+        for k, v in self.guest_dict.items():
+            if v == guest:
+                print(f"Guest {v} is booked in {k}")
+                return True
+        print("There is no guest booked in our hotel with that name.")
+        return None
+
+    # def check_if_guest_can_book_adjoining_rooms(self, room_number):
+    #     self.__generate_map_of_free_rooms(self.building)
+    #     for k, v in self.room_dict.items():
+    #         if k.room_number == room_number:
+
+
 
 
 if __name__ == '__main__':
@@ -119,7 +146,7 @@ if __name__ == '__main__':
     g = Person('Kamil', 'Cieszkowski')
 
     # Generowanie Hotelu
-    h = Hotel(5, 17)
+    h = Hotel(5, 25)
     h.create_floors()
     h.create_hotel()
 
@@ -127,8 +154,10 @@ if __name__ == '__main__':
     # h = Hotel(10,2)
 
     # Zameldowanie Gościa na piętro 2 do pokoju 11
-    h.move_in(2, 11, g)
+    h.move_in(g, 2, 11)
 
     # Pokazanie wolnych pokoi
-    h.show_free_rooms()
+    # h.show_free_rooms()
 
+    # Sprawdzenie czy gość znajduje się w hotelu
+    h.check_if_guest_is_in_hotel(g)
